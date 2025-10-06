@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fuzzy Name Search</title>
 
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Favicon / tab icon -->
   <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
   <link rel="alternate icon" href="/static/favicon.svg">
@@ -23,7 +28,7 @@
     </header>
 
     <section class="card" aria-labelledby="search-title">
-      <h2 id="search-title" class="visually-hidden" style="position:absolute;left:-9999px;">Search</h2>
+      <h2 id="search-title" class="visually-hidden">Search</h2>
 
       <form method="POST" action="/" class="form-grid">
         <div>
@@ -40,16 +45,19 @@
           </select>
         </div>
 
+        <!-- Methods as chips -->
         <div style="grid-column: 1 / -1;">
           <label class="label">Methods</label>
-          <div class="methods">
+
+          <!-- The buttons act as chips; selected values are mirrored as hidden inputs -->
+          <div id="methodChips"
+               class="methods"
+               data-selected='{{ (methods or []) | tojson | safe }}'>
             {% for m in all_methods %}
-              <label class="checkbox">
-                <input type="checkbox" name="methods" value="{{ m }}" {% if m in methods %}checked{% endif %}>
-                {{ m }}
-              </label>
+              <button type="button" class="chip" data-value="{{ m }}">{{ m }}</button>
             {% endfor %}
           </div>
+          <div id="methodHidden"></div>
         </div>
 
         <div>
@@ -88,7 +96,7 @@
   </div>
 
   <script>
-    // simple theme toggle (remembers your choice)
+    // Theme toggle (remembers your choice)
     (function() {
       const key = 'theme';
       const root = document.documentElement;
@@ -106,6 +114,49 @@
         if (next) localStorage.setItem(key, next); else localStorage.removeItem(key);
         applyTheme(next);
       });
+    })();
+
+    // Chip multi-select -> hidden inputs named "methods"
+    (function(){
+      const wrap = document.getElementById('methodChips');
+      const hidden = document.getElementById('methodHidden');
+      if (!wrap || !hidden) return;
+
+      const selected = new Set(JSON.parse(wrap.dataset.selected || '[]'));
+
+      function syncHidden() {
+        hidden.innerHTML = '';
+        for (const v of selected) {
+          const inp = document.createElement('input');
+          inp.type = 'hidden';
+          inp.name = 'methods';
+          inp.value = v;
+          hidden.appendChild(inp);
+        }
+      }
+
+      function setPressed(btn, on) {
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.classList.toggle('chip--active', on);
+      }
+
+      for (const btn of wrap.querySelectorAll('.chip')) {
+        const v = btn.dataset.value;
+        setPressed(btn, selected.has(v));
+
+        btn.addEventListener('click', () => {
+          if (selected.has(v)) selected.delete(v); else selected.add(v);
+          setPressed(btn, selected.has(v));
+          syncHidden();
+        });
+
+        // keyboard support
+        btn.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); btn.click(); }
+        });
+      }
+
+      syncHidden();
     })();
   </script>
 </body>
