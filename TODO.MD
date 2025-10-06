@@ -3,4 +3,4 @@
 - [ ] add time taken in result per each method.
 
 ## Future Enhancements
-- [ ] implement evaluations page
+- [ ] implement evaluations page/endpoint
