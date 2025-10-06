@@ -2,64 +2,111 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Fuzzy Name Search</title>
-  <style>
-    body { font-family: Arial, sans-serif; max-width: 900px; margin: 1.5rem auto; padding: 1rem; }
-    .method-block { margin-top: 1rem; border: 1px solid #eee; padding: 0.75rem; border-radius: 6px; }
-  </style>
+
+  <!-- Favicon / tab icon -->
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="alternate icon" href="/static/favicon.svg">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-  <h1>Fuzzy Name Search</h1>
-
-  <form method="POST" action="/" style="margin-bottom: 1.5rem;">
-    <label>
-      Query:
-      <input type="text" name="query" required value="{{ query or '' }}" style="width: 360px;">
-    </label>
-    <br><br>
-
-    <label>Field:
-      <select name="field">
-        <option value="first" {% if field == 'first' %}selected{% endif %}>First name</option>
-        <option value="last" {% if field == 'last' %}selected{% endif %}>Last name</option>
-        <option value="full" {% if field == 'full' %}selected{% endif %}>Full name</option>
-      </select>
-    </label>
-    <br><br>
-
-    <label>Methods:</label><br>
-    {% for m in all_methods %}
-      <label>
-        <input type="checkbox" name="methods" value="{{ m }}" {% if m in methods %}checked{% endif %}>
-        {{ m }}
-      </label><br>
-    {% endfor %}
-
-    <br>
-    <label>Limit:
-      <input type="number" name="limit" min="1" max="100" value="{{ limit or 5 }}">
-    </label>
-    <br><br>
-
-    <button type="submit">Search</button>
-  </form>
-
-  {% if results %}
-    <h2>Results</h2>
-    {% for block in results %}
-      <div class="method-block">
-        <h3>{{ block.method }}</h3>
-        {% if block.hits %}
-          <ul>
-            {% for hit in block.hits %}
-              <li>{{ hit.full_name }} — {{ "%.1f"|format(hit.score) }}</li>
-            {% endfor %}
-          </ul>
-        {% else %}
-          <p><em>No matches</em></p>
-        {% endif %}
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <h1>Fuzzy Name Search</h1>
       </div>
-    {% endfor %}
-  {% endif %}
+      <button id="themeToggle" class="theme-toggle" type="button" title="Toggle theme">Toggle theme</button>
+    </header>
+
+    <section class="card" aria-labelledby="search-title">
+      <h2 id="search-title" class="visually-hidden" style="position:absolute;left:-9999px;">Search</h2>
+
+      <form method="POST" action="/" class="form-grid">
+        <div>
+          <label class="label">Query</label>
+          <input class="input" type="text" name="query" required value="{{ query or '' }}">
+        </div>
+
+        <div>
+          <label class="label">Field</label>
+          <select class="select" name="field">
+            <option value="first" {% if field == 'first' %}selected{% endif %}>First name</option>
+            <option value="last"  {% if field == 'last' %}selected{% endif %}>Last name</option>
+            <option value="full"  {% if field == 'full' %}selected{% endif %}>Full name</option>
+          </select>
+        </div>
+
+        <div style="grid-column: 1 / -1;">
+          <label class="label">Methods</label>
+          <div class="methods">
+            {% for m in all_methods %}
+              <label class="checkbox">
+                <input type="checkbox" name="methods" value="{{ m }}" {% if m in methods %}checked{% endif %}>
+                {{ m }}
+              </label>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div>
+          <label class="label">Limit</label>
+          <input class="number" type="number" name="limit" min="1" max="100" value="{{ limit or 5 }}">
+        </div>
+
+        <div class="actions">
+          <button class="button" type="submit">Search</button>
+          <button class="button secondary" type="reset">Reset</button>
+        </div>
+      </form>
+
+      <p class="meta">Tip: you can select multiple methods.</p>
+    </section>
+
+    {% if results %}
+      <h2 class="section-title">Results</h2>
+      {% for block in results %}
+        <div class="method-block">
+          <h3>{{ block.method }}</h3>
+          {% if block.hits %}
+            <ul class="hit-list">
+              {% for hit in block.hits %}
+                <li>{{ hit.full_name }} <span class="score">— {{ "%.1f"|format(hit.score) }}</span></li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p><em>No matches</em></p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <footer class="footer">Fuzzy Name Search • {{ all_methods|length }} method(s) available</footer>
+  </div>
+
+  <script>
+    // simple theme toggle (remembers your choice)
+    (function() {
+      const key = 'theme';
+      const root = document.documentElement;
+      const btn = document.getElementById('themeToggle');
+
+      function applyTheme(t) {
+        if (!t) { root.removeAttribute('data-theme'); return; }
+        root.setAttribute('data-theme', t);
+      }
+      applyTheme(localStorage.getItem(key));
+
+      btn?.addEventListener('click', () => {
+        const current = root.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : (current === 'light' ? null : 'dark');
+        if (next) localStorage.setItem(key, next); else localStorage.removeItem(key);
+        applyTheme(next);
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,175 @@
+/* --------- Theme tokens --------- */
+:root {
+  --bg: #ffffff;
+  --text: #0b1220;
+  --muted: #6b7280;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --shadow: 0 8px 24px rgba(0,0,0,0.08);
+  --accent: #16a34a; /* tasteful green accent */
+  --accent-contrast: #ffffff;
+  --radius: 12px;
+  --focus: 0 0 0 3px rgba(22,163,74,0.35);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220;
+    --text: #e5e7eb;
+    --muted: #a1a1aa;
+    --card: #0f172a;
+    --border: #1f2937;
+    --shadow: 0 8px 24px rgba(0,0,0,0.45);
+  }
+}
+
+/* manual theme override */
+html[data-theme="light"] { color-scheme: light; }
+html[data-theme="dark"]  { color-scheme: dark; }
+
+/* --------- Global --------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 960px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex; align-items: center; gap: 10px;
+}
+
+.brand .logo {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--accent);
+  box-shadow: var(--shadow);
+}
+
+.brand h1 {
+  font-size: 1.25rem;
+  margin: 0; letter-spacing: 0.2px;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.theme-toggle:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* --------- Card/Form --------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr 280px;
+    align-items: end;
+  }
+}
+
+.label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.input, .select, .number {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+}
+.input:focus, .select:focus, .number:focus { outline: none; box-shadow: var(--focus); }
+
+.methods {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 6px 12px;
+}
+
+.checkbox {
+  display: flex; align-items: center; gap: 8px; font-size: 0.95rem;
+}
+
+.actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+
+.button {
+  appearance: none;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+.button.secondary {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border);
+}
+.button:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* --------- Results --------- */
+.section-title { margin: 22px 0 10px; font-size: 1.1rem; }
+
+.method-block {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.hit-list { margin: 8px 0 0 16px; }
+.hit-list li { padding: 2px 0; }
+.score { opacity: 0.75; }
+
+/* --------- Small helpers --------- */
+.meta {
+  margin-top: 6px; font-size: 0.85rem; color: var(--muted);
+}
+
+.footer {
+  margin: 28px 0 10px; font-size: 0.85rem; color: var(--muted);
+  text-align: center;
+}
