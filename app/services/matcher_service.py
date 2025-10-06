@@ -1,44 +1,63 @@
-from app.core.config import settings
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Dict, Any
+
 from app.matchers.base import get_matcher
 from app.services.dataset import DataContainer
-import pandas as pd
+
 
 class MatcherService:
+    """
+    Handles fuzzy matching across first, last, or full name datasets.
+    """
+
     def __init__(self, data: DataContainer):
         self.data = data
+        # create one shared thread pool for CPU-bound operations
+        self.executor = ThreadPoolExecutor(max_workers=4)
 
-    def _get_df_by_field(self, field: str) -> pd.DataFrame:
-        match field:
-            case "first":
-                return self.data.df_first
-            case "last":
-                return self.data.df_last
-            case "full":
-                return self.data.df_full
-            case _:
-                raise ValueError(f"Invalid field: {field}")
+    def _get_df_by_field(self, field: str):
+        if field == "first":
+            return self.data.df_first
+        elif field == "last":
+            return self.data.df_last
+        elif field == "full":
+            return self.data.df_full
+        else:
+            raise ValueError(f"Unknown field: {field}")
+
+    def _search_method(
+        self, matcher_name: str, df, query: str,
+        limit: int, score_cutoff: int, params: dict
+    ):
+        matcher = get_matcher(matcher_name)
+        hits = matcher.search(query, df, ["name"], limit, score_cutoff, params)
+        return {"method": matcher_name, "hits": hits}
 
     def run_methods(
         self,
         query: str,
         field: str,
-        methods: list[str],
+        methods: List[str],
         limit: int,
         score_cutoff: int,
-        method_params: dict
-    ):
+        method_params: Dict[str, Any],
+    ) -> List[Dict[str, Any]]:
+        """
+        Run multiple matchers concurrently in separate threads.
+        Returns a list of {method, hits}.
+        """
         df = self._get_df_by_field(field)
+
+        from concurrent.futures import as_completed
+        futures = []
         results = []
+
         for m in methods:
-            matcher = get_matcher(m)
-            params = method_params.get(m)
-            hits = matcher.search(
-                query=query,
-                df=df,
-                fields=["name"],  # always one field now
-                limit=limit,
-                score_cutoff=score_cutoff,
-                params=params
-            )
-            results.append({ "method": m, "hits": hits })
+            params = method_params.get(m, {})
+            f = self.executor.submit(self._search_method, m, df, query, limit, score_cutoff, params)
+            futures.append(f)
+
+        for f in as_completed(futures):
+            results.append(f.result())
+
         return results
