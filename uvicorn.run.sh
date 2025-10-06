@@ -1,7 +1,10 @@
 #!/bin/bash
-# Simple script to run the FastAPI app with auto-reload
+# Activate the virtual environment
+source .venv/bin/activate
 
+# Run the app in debug mode with verbose logging
 uvicorn app.main:app \
     --host 127.0.0.1 \
     --port 8000 \
-    --reload
+    --reload \
+    --log-level debug
