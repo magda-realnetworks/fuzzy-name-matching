@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fuzzy Name Search</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; max-width: 800px; margin: auto; }
+    .method-block { margin-top: 1.5rem; border: 1px solid #ddd; padding: 1rem; border-radius: 8px; }
+    .method-block h3 { margin-top: 0; }
+    .result { padding: 0.25rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Fuzzy Name Search Playground</h1>
+  <form method="POST" action="/" style="margin-bottom: 2rem;">
+    <label>Query:
+      <input type="text" name="query" required style="width: 300px;" value="{{ query or '' }}">
+    </label><br><br>
+
+    <label>Search field:</label>
+    <select name="field">
+      <option value="first" {% if field == 'first' %}selected{% endif %}>First Name</option>
+      <option value="last" {% if field == 'last' %}selected{% endif %}>Last Name</option>
+      <option value="full" {% if field == 'full' %}selected{% endif %}>Full Name</option>
+    </select><br><br>
+
+    <label>Methods:</label><br>
+    {% for method in all_methods %}
+      <label>
+        <input type="checkbox" name="methods" value="{{ method }}" {% if method in methods %}checked{% endif %}>
+        {{ method }}
+      </label><br>
+    {% endfor %}
+
+    <br>
+    <label>Limit:
+      <input type="number" name="limit" min="1" max="50" value="{{ limit or 5 }}">
+    </label><br><br>
+
+    <button type="submit">Search</button>
+  </form>
+
+  {% if results %}
+    <h2>Results</h2>
+    {% for block in results %}
+      <div class="method-block">
+        <h3>{{ block.method }}</h3>
+        {% for r in block.hits %}
+          <div class="result">{{ r.full_name }} — {{ "%.1f"|format(r.score) }}</div>
+        {% else %}
+          <p><i>No matches</i></p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  {% endif %}
+</body>
+</html>
