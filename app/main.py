@@ -70,25 +70,20 @@ async def search_form(
 ):
     """
     Handle form POST from templates/index.html.
-
-    - If no methods selected, default to all registered matchers.
-    - Offload the synchronous matcher work to a thread so the async loop isn't blocked.
     """
     if not methods:
         methods = list_matchers()
 
     svc: MatcherService = request.app.state.matcher_service
 
-    # Offload to a worker thread to avoid blocking the event loop.
-    # This assumes svc.run_methods is synchronous (as in the blueprint).
     results = await anyio.to_thread.run_sync(
         svc.run_methods,
         query,        # query
-        field,        # field: "first"|"last"|"full"
-        methods,      # methods list
-        limit,        # limit
-        settings.default_score_cutoff,           # score_cutoff (hard-coded default here; make configurable if you want)
-        {}            # method_params
+        field,        # "first" | "last" | "full"
+        methods,      # may be None -> defaults inside service
+        limit,        # may be any int -> clamped inside service
+        None,         # score_cutoff -> default inside service
+        None          # method_params -> {}
     )
 
     return templates.TemplateResponse("index.html", {

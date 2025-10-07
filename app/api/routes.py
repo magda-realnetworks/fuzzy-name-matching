@@ -12,18 +12,17 @@ def get_services(req: Request) -> MatcherService:
 
 @router.post("/search", response_model=SearchResponse)
 def search(payload: SearchRequest, svc: MatcherService = Depends(get_services)):
-    limit = min(max(payload.limit, 1), settings.max_limit)
     results = svc.run_methods(
         query=payload.query,
         field=payload.field,
-        methods=payload.methods,
-        limit=limit,
-        score_cutoff=payload.score_cutoff,
-        method_params=payload.method_params
+        methods=payload.methods,            # None or [] -> defaults to all in service
+        limit=payload.limit,                # clamped in service
+        score_cutoff=payload.score_cutoff,  # defaulted in service if None
+        method_params=payload.method_params # {} defaulted in service if None
     )
     return SearchResponse(
         query=payload.query,
-        fields=[payload.field],  # still modeled as list in response
+        fields=[payload.field],
         results=[
             MethodResult(method=r["method"], hits=[MatchHit(**h) for h in r["hits"]])
             for r in results
