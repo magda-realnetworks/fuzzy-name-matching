@@ -33,4 +33,4 @@ def get_matcher(name: str) -> Matcher:
     return cls()
 
 def list_matchers() -> List[str]:
-    return list(_REGISTRY.keys())
+    return sorted(_REGISTRY.keys())

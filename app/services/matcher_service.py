@@ -49,8 +49,8 @@ class MatcherService:
         Run multiple matchers concurrently in separate threads.
         Applies sensible defaults if args are missing.
         Returns list of {"method": matcher_name, "hits": [...]}, one per method.
+        Deterministic result order (alphabetical by method name).
         """
-        from concurrent.futures import as_completed
         from app.matchers.base import list_matchers
         from app.core.config import settings
 
@@ -66,20 +66,22 @@ class MatcherService:
 
         # --- normalize inputs ---
         methods = methods or list_matchers()
+        methods = sorted(methods)  # enforce deterministic alphabetical order
         limit = clamp(coerce_int(limit, settings.default_limit), 1, settings.max_limit)
         score_cutoff = coerce_int(score_cutoff, settings.default_score_cutoff)
         method_params = method_params or {}
 
         df = self._get_df_by_field(field)
 
-        futures = []
-        results = []
-        for m in methods:
-            params = method_params.get(m, {})
-            f = self.executor.submit(self._run_single_matcher, m, df, query, limit, score_cutoff, params)
-            futures.append(f)
+        # start all tasks concurrently
+        futures = {
+            m: self.executor.submit(
+                self._run_single_matcher,
+                m, df, query, limit, score_cutoff, method_params.get(m, {})
+            )
+            for m in methods
+        }
 
-        for f in as_completed(futures):
-            results.append(f.result())
-
+        # collect results in the fixed order
+        results = [futures[m].result() for m in methods]
         return results
