@@ -24,7 +24,11 @@ def search(payload: SearchRequest, svc: MatcherService = Depends(get_services)):
         query=payload.query,
         fields=[payload.field],
         results=[
-            MethodResult(method=r["method"], hits=[MatchHit(**h) for h in r["hits"]])
+            MethodResult(
+                method=r["method"],
+                duration_ms=r.get("duration_ms"),
+                hits=[MatchHit(**h) for h in r["hits"]],
+            )
             for r in results
         ]
     )

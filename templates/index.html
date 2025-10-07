@@ -78,7 +78,12 @@
       <h2 class="section-title">Results</h2>
       {% for block in results %}
         <div class="method-block">
-          <h3>{{ block.method }}</h3>
+          <h3>
+            {{ block.method }}
+            {% if block.duration_ms is defined %}
+              <span class="meta">— {{ "%.1f"|format(block.duration_ms) }} ms</span>
+            {% endif %}
+          </h3>
           {% if block.hits %}
             <ul class="hit-list">
               {% for hit in block.hits %}

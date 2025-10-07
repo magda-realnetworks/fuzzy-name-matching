@@ -28,12 +28,13 @@ class MatcherService:
         self, matcher_name: str, df, query: str,
         limit: int, score_cutoff: int, params: dict
     ):
-        """ Run a single matcher on the given dataframe.
-        Returns {"method": matcher_name, "hits": [...]}
-        """
+        """Run one matcher and return {'method': name, 'duration_ms': float, 'hits': [...]}."""
+        from time import perf_counter
         matcher = get_matcher(matcher_name)
+        t0 = perf_counter()
         hits = matcher.search(query, df, ["name"], limit, score_cutoff, params)
-        return {"method": matcher_name, "hits": hits}
+        duration_ms = (perf_counter() - t0) * 1000.0
+        return {"method": matcher_name, "duration_ms": duration_ms, "hits": hits}
 
     def run_methods(
         self,

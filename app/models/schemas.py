@@ -22,6 +22,7 @@ class MatchHit(BaseModel):
 
 class MethodResult(BaseModel):
     method: str
+    duration_ms: float | None = None
     hits: List[MatchHit]
 
 class SearchResponse(BaseModel):
