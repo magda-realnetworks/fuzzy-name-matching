@@ -31,8 +31,17 @@ http://127.0.0.1:8000/
 ```
 
 ---
-
 **Tip:** Make sure the `uvicorn.run.sh` script has executable permissions:
+
+**Full setup script**
+```bash
+git clone https://github.com/magda-realnetworks/fuzzy-name-matching.git
+cd fuzzy-name-matching
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+./uvicorn.run.sh
+```
 ```bash
 chmod +x uvicorn.run.sh
 ```
