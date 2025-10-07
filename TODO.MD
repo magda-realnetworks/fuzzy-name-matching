@@ -1,7 +1,8 @@
 # Project To-Do List
 
 - [ ] add time taken in result per each method.
-- [ ] add more names - to be 200k  or so
+- [ ] poboljsat imena - uzet iz us census + baby names dataseta
+- [x] add more names - to be 200k  or so
 
 ## Future Enhancements
 - [x] dodat css/javascript u static folder
