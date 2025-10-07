@@ -55,7 +55,7 @@ async def index(request: Request):
         "field": "full",
         "methods": [],
         "all_methods": list_matchers(),
-        "limit": 5,
+        "limit": settings.default_limit,
         "results": None
     })
 
@@ -66,7 +66,7 @@ async def search_form(
     query: str = Form(...),
     field: str = Form(...),
     methods: Optional[List[str]] = Form(None),
-    limit: int = Form(5)
+    limit: int = Form(settings.default_limit)
 ):
     """
     Handle form POST from templates/index.html.
@@ -87,7 +87,7 @@ async def search_form(
         field,        # field: "first"|"last"|"full"
         methods,      # methods list
         limit,        # limit
-        None,           # score_cutoff (hard-coded default here; make configurable if you want)
+        settings.default_score_cutoff,           # score_cutoff (hard-coded default here; make configurable if you want)
         {}            # method_params
     )
 
