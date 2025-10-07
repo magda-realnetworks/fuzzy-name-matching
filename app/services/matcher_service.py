@@ -12,7 +12,6 @@ class MatcherService:
 
     def __init__(self, data: DataContainer):
         self.data = data
-        # create one shared thread pool for CPU-bound operations
         self.executor = ThreadPoolExecutor(max_workers=4)
 
     def _get_df_by_field(self, field: str):
@@ -40,21 +39,40 @@ class MatcherService:
         self,
         query: str,
         field: str,
-        methods: List[str],
-        limit: int,
-        score_cutoff: int,
-        method_params: Dict[str, Any],
+        methods: List[str] | None = None,
+        limit: int | None = None,
+        score_cutoff: int | None = None,
+        method_params: Dict[str, Dict[str, Any]] | None = None,
     ) -> List[Dict[str, Any]]:
         """
         Run multiple matchers concurrently in separate threads.
-        Returns a list of {method, hits}.
+        Applies sensible defaults if args are missing.
+        Returns list of {"method": matcher_name, "hits": [...]}, one per method.
         """
+        from concurrent.futures import as_completed
+        from app.matchers.base import list_matchers
+        from app.core.config import settings
+
+        # --- tidy normalization helpers (scoped to this function) ---
+        def coerce_int(val, default):
+            try:
+                return int(val)
+            except (TypeError, ValueError):
+                return default
+
+        def clamp(n, lo, hi):
+            return max(lo, min(n, hi))
+
+        # --- normalize inputs ---
+        methods = methods or list_matchers()
+        limit = clamp(coerce_int(limit, settings.default_limit), 1, settings.max_limit)
+        score_cutoff = coerce_int(score_cutoff, settings.default_score_cutoff)
+        method_params = method_params or {}
+
         df = self._get_df_by_field(field)
 
-        from concurrent.futures import as_completed
         futures = []
         results = []
-
         for m in methods:
             params = method_params.get(m, {})
             f = self.executor.submit(self._run_single_matcher, m, df, query, limit, score_cutoff, params)
