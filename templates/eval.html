@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluate Matchers</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="alternate icon" href="/static/favicon.svg">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <h1>Fuzzy Name Search</h1>
+        <nav class="nav">
+          <a href="/" class="tab">Search</a>
+          <a href="/eval" class="tab active">Evaluate</a>
+        </nav>
+      </div>
+      <button id="themeToggle" class="theme-toggle" type="button" title="Toggle theme">Toggle theme</button>
+    </header>
+
+    <section class="card">
+      <form method="POST" action="/eval" class="form-grid" enctype="multipart/form-data">
+        <div>
+          <label class="label">Field</label>
+          <select class="select" name="field">
+            <option value="first" {% if field == 'first' %}selected{% endif %}>First name</option>
+            <option value="last"  {% if field == 'last' %}selected{% endif %}>Last name</option>
+            <option value="full"  {% if field == 'full' %}selected{% endif %}>Full name</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="label">Choose test dataset (data/test)</label>
+          <select class="select" name="dataset_name">
+            <option value="">— Select a CSV —</option>
+            {% for f in datasets %}
+              <option value="{{ f }}" {% if selected_dataset == f %}selected{% endif %}>{{ f }}</option>
+            {% endfor %}
+          </select>
+          <p class="meta">Or upload your own CSV below.</p>
+        </div>
+
+        <div style="grid-column: 1 / -1;">
+          <label class="label">Upload CSV (optional)</label>
+          <input class="input" type="file" name="upload" accept=".csv">
+          <p class="meta">CSV must have two columns, e.g.: <code>mispelled,correct</code> (we also accept <code>misspelled</code>).</p>
+        </div>
+
+        <div class="actions">
+          <button class="button" type="submit">Run evaluation</button>
+          <a class="button secondary" href="/eval">Reset</a>
+        </div>
+      </form>
+    </section>
+
+    {% if error %}
+      <p class="meta" style="color:#ef4444;">{{ error }}</p>
+    {% endif %}
+
+    {% if results %}
+      <h2 class="section-title">Accuracy by method</h2>
+      <div class="method-block">
+        <ul class="hit-list">
+          {% for row in results %}
+            <li><strong>{{ row.method }}</strong> — {{ "%.1f"|format(row.accuracy) }}% ({{ row.correct }}/{{ row.total }})</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <footer class="footer">Evaluation • {{ datasets|length }} dataset(s) detected</footer>
+  </div>
+
+  <script>
+    // theme toggle (same as index)
+    (function() {
+      const key='theme', root=document.documentElement, btn=document.getElementById('themeToggle');
+      function applyTheme(t){ if(!t){root.removeAttribute('data-theme');return;} root.setAttribute('data-theme', t); }
+      applyTheme(localStorage.getItem(key));
+      btn?.addEventListener('click', ()=>{
+        const cur=root.getAttribute('data-theme');
+        const next=cur==='dark'?'light':(cur==='light'?null:'dark');
+        if(next) localStorage.setItem(key,next); else localStorage.removeItem(key);
+        applyTheme(next);
+      });
+    })();
+  </script>
+</body>
+</html>

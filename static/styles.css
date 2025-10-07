@@ -180,3 +180,21 @@ input, select, button, textarea, option {
 /* --------- Small helpers --------- */
 .meta { margin-top: 6px; font-size: 0.85rem; color: var(--muted); }
 .footer { margin: 28px 0 10px; font-size: 0.85rem; color: var(--muted); text-align: center; }
+
+.nav { display: flex; gap: 8px; margin-left: 12px; }
+.tab {
+  text-decoration: none;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  font-weight: 500;
+}
+.tab:hover { filter: brightness(0.98); }
+.tab.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+}
