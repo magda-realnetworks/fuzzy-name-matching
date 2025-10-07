@@ -25,10 +25,13 @@ class MatcherService:
         else:
             raise ValueError(f"Unknown field: {field}")
 
-    def _search_method(
+    def _run_single_matcher(
         self, matcher_name: str, df, query: str,
         limit: int, score_cutoff: int, params: dict
     ):
+        """ Run a single matcher on the given dataframe.
+        Returns {"method": matcher_name, "hits": [...]}
+        """
         matcher = get_matcher(matcher_name)
         hits = matcher.search(query, df, ["name"], limit, score_cutoff, params)
         return {"method": matcher_name, "hits": hits}
@@ -54,7 +57,7 @@ class MatcherService:
 
         for m in methods:
             params = method_params.get(m, {})
-            f = self.executor.submit(self._search_method, m, df, query, limit, score_cutoff, params)
+            f = self.executor.submit(self._run_single_matcher, m, df, query, limit, score_cutoff, params)
             futures.append(f)
 
         for f in as_completed(futures):
