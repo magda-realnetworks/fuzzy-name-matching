@@ -1,6 +1,7 @@
 # Project To-Do List
 
 - [ ] add time taken in result per each method.
+- [ ] add more names - to be 200k  or so
 
 ## Future Enhancements
 - [ ] dodat css/javascript u static folder

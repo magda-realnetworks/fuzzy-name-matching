@@ -87,7 +87,7 @@ async def search_form(
         field,        # field: "first"|"last"|"full"
         methods,      # methods list
         limit,        # limit
-        70,           # score_cutoff (hard-coded default here; make configurable if you want)
+        None,           # score_cutoff (hard-coded default here; make configurable if you want)
         {}            # method_params
     )
 
