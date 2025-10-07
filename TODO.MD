@@ -4,6 +4,6 @@
 - [ ] add more names - to be 200k  or so
 
 ## Future Enhancements
-- [ ] dodat css/javascript u static folder
+- [+] dodat css/javascript u static folder
 - [ ] dodat hiperparametre za metode
 - [ ] implement evaluations page/endpoint
