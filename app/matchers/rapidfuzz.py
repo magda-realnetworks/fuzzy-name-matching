@@ -70,7 +70,8 @@ def _register_matcher(name: str, scorer) -> None:
                 choices,
                 scorer=self._SCORER,
                 score_cutoff=score_cutoff,
-                limit=limit
+                limit=limit,
+                scorer_kwargs=params
             )
             return _format_hits_from_rows(hits, df)
 
