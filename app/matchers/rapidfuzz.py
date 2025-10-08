@@ -20,7 +20,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Tuple
 import pandas as pd
 
-from rapidfuzz import fuzz, process
+from rapidfuzz import distance, fuzz, process
 from app.matchers.base import register
 
 
@@ -76,7 +76,7 @@ def _register_matcher(name: str, scorer) -> None:
 
 
 
-# ---- Register built-in RapidFuzz scorers ----
+# ---- Register built-in RapidFuzz.fuzz scorers ----
 _register_matcher("rapidfuzz_ratio", fuzz.ratio)
 _register_matcher("rapidfuzz_partial_ratio", fuzz.partial_ratio)
 _register_matcher("rapidfuzz_token_set_ratio", fuzz.token_set_ratio)
@@ -87,3 +87,13 @@ _register_matcher("rapidfuzz_token_ratio", fuzz.token_ratio)
 _register_matcher("rapidfuzz_partial_token_ratio", fuzz.partial_token_ratio)
 _register_matcher("rapidfuzz_Wratio", fuzz.WRatio)
 _register_matcher("rapidfuzz_Qratio", fuzz.QRatio)
+#------------ methods from RapidFuzz.distance ------------
+_register_matcher("rapidfuzz_DamerauLevenshtein", distance.DamerauLevenshtein.normalized_similarity)
+_register_matcher("rapidfuzz_Indel", distance.Indel.normalized_similarity)
+_register_matcher("rapidfuzz_Jaro", distance.Jaro.normalized_similarity)
+_register_matcher("rapidfuzz_JaroWinkler", distance.JaroWinkler.normalized_similarity)
+_register_matcher("rapidfuzz_Levenshtein", distance.Levenshtein.normalized_similarity)
+_register_matcher("rapidfuzz_LCSseq", distance.LCSseq.normalized_similarity)
+_register_matcher("rapidfuzz_OSA", distance.OSA.normalized_similarity)
+_register_matcher("rapidfuzz_Prefix", distance.Prefix.normalized_similarity)
+_register_matcher("rapidfuzz_Postfix", distance.Postfix.normalized_similarity)
