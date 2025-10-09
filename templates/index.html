@@ -91,7 +91,7 @@
           {% if block.hits %}
             <ul class="hit-list">
               {% for hit in block.hits %}
-                <li>{{ hit.full_name }} <span class="score">— {{ "%.1f"|format(hit.score) }}</span></li>
+                <li>{{ hit.match }} <span class="score">— {{ "%.1f"|format(hit.score) }}</span></li>
               {% endfor %}
             </ul>
           {% else %}

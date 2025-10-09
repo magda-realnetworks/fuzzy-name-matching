@@ -7,6 +7,17 @@ from app.matchers.base import list_matchers, get_matcher
 
 
 def _pick_col(df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
+    """
+    Selects and returns the name of the first column in the DataFrame `df` that matches any of the 
+    provided candidate names (case-insensitive and stripped of leading/trailing whitespace).
+
+    Args:
+        df (pd.DataFrame): The DataFrame whose columns are to be searched.
+        candidates (list[str]): A list of candidate column names to match against.
+
+    Returns:
+        Optional[str]: The name of the matching column if found, otherwise None.
+    """
     lc = {c.lower().strip(): c for c in df.columns}
     for k in candidates:
         if k in lc:
@@ -24,7 +35,7 @@ def evaluate_pairs(
     For each (mispelled, correct) row:
       - add ALL unique 'correct' values to a temporary copy of the chosen field DF
       - run each matcher with limit=1, score_cutoff=0
-      - if top-1 full_name equals 'correct' (case-insensitive), count as correct
+      - if top-1 match equals 'correct' (case-insensitive), count as correct
     Returns: [{"method": str, "total": int, "correct": int, "accuracy": float}, ...] (alphabetical by method)
     """
     # ---- detect columns (accept common spellings/aliases) ----
@@ -73,7 +84,8 @@ def evaluate_pairs(
             q = row[left_col]
             truth = row[right_col]
             hits = matcher.search(q, df_eval, ["name"], limit=1, score_cutoff=0, params={})
-            if hits and hits[0]["full_name"].strip().casefold() == truth.strip().casefold():
+            if hits and hits[0]["match"].strip().casefold() == truth.strip().casefold():
+                print(f"method is {m}, query is {q}, truth is {truth}, hit is {hits[0]['match']}")
                 correct_cnt += 1
 
         acc = (correct_cnt / total * 100.0) if total else 0.0

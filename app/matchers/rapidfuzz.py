@@ -10,8 +10,7 @@ Each matcher implements .search(query, df, fields, limit, score_cutoff, params=N
 
 Returns a list of dicts with keys:
   - index (int): row position in df
-  - first_name, last_name: left empty (schema compatibility)
-  - full_name (str): matched string (row["name"])
+  - match (str): matched string (row["name"])
   - score (float): match score
   - extras (dict): extension point
 """
@@ -37,9 +36,7 @@ def _format_hits_from_rows(
             continue
         out.append({
             "index": int(row_pos),
-            "first_name": "",
-            "last_name": "",
-            "full_name": row["name"],
+            "match": row["name"],
             "score": float(score),
             "extras": {}
         })

@@ -14,9 +14,7 @@ class SearchRequest(BaseModel):
 
 class MatchHit(BaseModel):
     index: int
-    first_name: str
-    last_name: str
-    full_name: str
+    match: str
     score: float
     extras: Dict[str, Any] = Field(default_factory=dict)
 
