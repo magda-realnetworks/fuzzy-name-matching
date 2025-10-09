@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 from pathlib import Path
 
 class Settings(BaseSettings):
-    data_path: Path = Field(default=Path(__file__).resolve().parents[2] / "data" / "us_real_fb_names.csv")
+    data_path: Path = Field(default=Path(__file__).resolve().parents[2] / "data" / "celebtest_large_distinct.csv")
     preload_limit: int | None = None  # set to an int to cap rows during dev
     default_limit: int = 10
     max_limit: int = 100
