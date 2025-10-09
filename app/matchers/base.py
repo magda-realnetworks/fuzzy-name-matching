@@ -19,10 +19,12 @@ class Matcher(Protocol):
 # Simple registry so new matchers auto-discoverable
 _REGISTRY: dict[str, type] = {}
 
-def register(name: str):
+def register(name: str, scorer=None):
     def _wrap(cls):
         _REGISTRY[name] = cls
         cls.name = name
+        if scorer is not None:
+            cls._SCORER = staticmethod(scorer)
         return cls
     return _wrap
 

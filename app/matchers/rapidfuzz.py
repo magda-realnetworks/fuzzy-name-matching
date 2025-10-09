@@ -50,10 +50,8 @@ def _register_matcher(name: str, scorer) -> None:
     """
     Create and register a tiny class bound to a specific RapidFuzz scorer.
     """
-    @register(name)
+    @register(name, scorer)
     class _RFMatcher:
-        _SCORER = staticmethod(scorer)
-
         def search(
             self,
             query: str,
@@ -74,8 +72,6 @@ def _register_matcher(name: str, scorer) -> None:
                 scorer_kwargs=params
             )
             return _format_hits_from_rows(hits, df)
-
-
 
 # ---- Register built-in RapidFuzz.fuzz scorers ----
 _register_matcher("rapidfuzz_ratio", fuzz.ratio)
