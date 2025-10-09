@@ -2,8 +2,8 @@
 
 ## 1. Clone the Repository
 ```bash
-git clone <repository_url>
-cd <repository_folder>
+git clone https://github.com/magda-realnetworks/fuzzy-name-matching.git
+cd fuzzy-name-matching
 ```
 
 ## 2. Create and Activate Virtual Environment
