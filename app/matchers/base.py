@@ -21,10 +21,10 @@ _REGISTRY: dict[str, type] = {}
 
 def register(name: str, scorer=None):
     def _wrap(cls):
-        _REGISTRY[name] = cls
         cls.name = name
         if scorer is not None:
             cls._SCORER = staticmethod(scorer)
+        _REGISTRY[name] = cls
         return cls
     return _wrap
 
