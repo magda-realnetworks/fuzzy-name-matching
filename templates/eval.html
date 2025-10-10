@@ -67,14 +67,46 @@
     {% endif %}
 
     {% if results %}
-      <h2 class="section-title">Accuracy by method</h2>
-      <div class="method-block">
-        <ul class="hit-list">
-          {% for row in results %}
-            <li><strong>{{ row.method }}</strong> — {{ "%.1f"|format(row.accuracy) }}% ({{ row.correct }}/{{ row.total }})</li>
-          {% endfor %}
-        </ul>
-      </div>
+      <h2 class="section-title">Accuracy by format & method</h2>
+
+      {# results is: [ {"format": "raw", "results": [ {method, accuracy, correct, total, duration_ms?}, ... ]}, ... ] #}
+      {% for fmt in results %}
+        {% set fmt_id = 'eval-fmt-' ~ (fmt.format|replace(' ', '_')|lower) %}
+        <details class="format-block" id="{{ fmt_id }}">
+          <summary class="format-summary">
+            <span class="format-title">
+              {{ fmt.format | capitalize }}
+              {% if fmt.results and fmt.results|length %}
+                <span class="meta">— {{ fmt.results|length }} method(s)</span>
+              {% endif %}
+            </span>
+            <span class="chev" aria-hidden="true">▸</span>
+          </summary>
+
+          {% if fmt.results %}
+            <div class="format-grid">
+              {% for row in fmt.results %}
+                <div class="method-block">
+                  <h4>
+                    {{ row.method }}
+                    {% if row.duration_ms is defined %}
+                      <span class="meta">— {{ "%.1f"|format(row.duration_ms) }} ms</span>
+                    {% endif %}
+                  </h4>
+                  <ul class="hit-list">
+                    <li>
+                      <strong>{{ "%.1f"|format(row.accuracy) }}%</strong>
+                      <span class="meta">({{ row.correct }}/{{ row.total }})</span>
+                    </li>
+                  </ul>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="meta" style="padding: 0 12px 12px;">No results for this format.</p>
+          {% endif %}
+        </details>
+      {% endfor %}
     {% endif %}
 
     <footer class="footer">Evaluation • {{ datasets|length }} dataset(s) detected</footer>
@@ -91,6 +123,18 @@
         const next=cur==='dark'?'light':(cur==='light'?null:'dark');
         if(next) localStorage.setItem(key,next); else localStorage.removeItem(key);
         applyTheme(next);
+      });
+    })();
+
+    // remember expand/collapse state per format on the Evaluate page
+    (function() {
+      const key = (id) => `eval-format-open:${id}`;
+      document.querySelectorAll('details.format-block').forEach(d => {
+        const id = d.id || '';
+        try { if (localStorage.getItem(key(id)) === '1') d.setAttribute('open', ''); } catch {}
+        d.addEventListener('toggle', () => {
+          try { if (d.open) localStorage.setItem(key(id), '1'); else localStorage.removeItem(key(id)); } catch {}
+        });
       });
     })();
   </script>
