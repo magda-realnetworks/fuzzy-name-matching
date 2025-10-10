@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     col_last: str = "last_name"
     # formats
     possible_formats: list[str] = ["raw", "Metaphone", "IPA"]
-    default_format: str = "raw"
+    default_format: list[str] = ["raw"]
 
     class Config:
         env_prefix = "FUZZYAPP_"

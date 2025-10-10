@@ -68,7 +68,7 @@ async def search_form(
     query: str = Form(...),
     field: str = Form(...),
     methods: Optional[List[str]] = Form(None),
-    formats: Optional[List[str]] = Form(None),
+    formats: Optional[List[str]] = Form(settings.default_format),
     limit: int = Form(settings.default_limit)
 ):
     """
@@ -84,7 +84,7 @@ async def search_form(
         query,        # query
         field,        # "first" | "last" | "full"
         methods,      # may be None -> defaults inside service
-        formats,      # may be None -> defaults inside service
+        #formats,      # may be None -> defaults inside service
         limit,        # may be any int -> clamped inside service
         None,         # score_cutoff -> default inside service
         None          # method_params -> {}
