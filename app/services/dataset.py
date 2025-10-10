@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 import pandas as pd
 from app.core.config import settings
+import jellyfish
+from g2p_en import G2p
+
+g2p = G2p()
 
 @dataclass
 class DataContainer:
@@ -24,6 +28,7 @@ def load_dataset(path=None, limit=None) -> DataContainer:
 
     for d in [df_first, df_last, df_full]:
         d["name_lc"] = d["name"].str.lower()
-        d["name_lc_metaphone"] = d["name_lc"]  # add transformation logic later
-        d["name_lc_ipa"] = d["name_lc"]        # add transformation logic later
+        d["name_lc_metaphone"] = d["name_lc"].apply(lambda x: jellyfish.metaphone(x))
+        d["name_lc_ipa"] = d["name_lc"].apply(lambda x: "".join(g2p(x)))      # add transformation logic later
+        d.to_csv("tmp/debug.csv", index=False)  # DEBUG
     return DataContainer(df_first=df_first, df_last=df_last, df_full=df_full)

@@ -18,6 +18,9 @@ Returns a list of dicts with keys:
 from __future__ import annotations
 from typing import Any, Dict, List, Tuple
 import pandas as pd
+import jellyfish
+from g2p_en import G2p
+g2p = G2p()
 
 from rapidfuzz import distance, fuzz, process
 from app.matchers.base import register
@@ -58,13 +61,15 @@ def _register_matcher(name: str, scorer) -> None:
             score_cutoff: int,
             params: Dict[str, Any] | None = None
         ) -> List[Dict[str, Any]]:
-            q = query.lower()
             if format == "raw":
                 choices = df["name_lc"].values
+                q = query.lower()
             elif format == "Metaphone":
                 choices = df["name_lc_metaphone"].values
+                q= jellyfish.metaphone(query.lower())
             elif format == "IPA":
                 choices = df["name_lc_ipa"].values
+                q = "".join(g2p(query.lower()))
             else:
                 raise ValueError(f"Unknown format: {format}")
             hits = process.extract(
