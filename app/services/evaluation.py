@@ -62,11 +62,11 @@ def evaluate_pairs(
 
     # ---- choose base DF by field ----
     if field == "first":
-        base = container.df_first[["name", "name_lc"]]
+        base = container.df_first[["name", "name_lc", "name_lc_metaphone", "name_lc_ipa"]]
     elif field == "last":
-        base = container.df_last[["name", "name_lc"]]
+        base = container.df_last[["name", "name_lc", "name_lc_metaphone", "name_lc_ipa"]]
     elif field == "full":
-        base = container.df_full[["name", "name_lc"]]
+        base = container.df_full[["name", "name_lc", "name_lc_metaphone", "name_lc_ipa"]]
     else:
         raise ValueError(f"Unknown field: {field}")
 
@@ -75,8 +75,12 @@ def evaluate_pairs(
     add["name_lc"] = add["name"].str.lower()
     add["name_lc_metaphone"] = add["name_lc"].apply(lambda x: jellyfish.metaphone(x))
     add["name_lc_ipa"] = add["name_lc"].apply(lambda x: "".join(g2p(x)))
+    print("added rows:")
+    print(add)
     df_eval = pd.concat([base, add], ignore_index=True)
     df_eval = df_eval.drop_duplicates(subset="name_lc", keep="first").reset_index(drop=True)
+    print("df eval sample:")
+    print(df_eval[100:110])
 
     # ---- run all/selected methods ----
     methods = sorted(methods or list_matchers())
@@ -95,15 +99,13 @@ def evaluate_pairs(
                 q = row[left_col]
                 truth = row[right_col]
                 hits = matcher.search(q, df_eval, format, limit=1, score_cutoff=0, params={})
-                match=hits[0]["match"] if hits else None
                 if hits and hits[0]["match"].strip().casefold() == truth.strip().casefold():
-                    print(f"method is {m}, query is {q}, truth is {truth}, hit is {hits[0]['match']}")
+                    print(f"{format}, {m}, query is {q}, truth is {truth}, hit is {hits[0]['match']}")
                     correct_cnt += 1
 
             acc = (correct_cnt / total * 100.0) if total else 0.0
             format_results.append({"method": m, "total": total, "correct": correct_cnt, "accuracy": acc})
         
         results.append({"format": format, "results": format_results})
-        print(results)
     
     return results
