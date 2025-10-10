@@ -103,7 +103,7 @@
             <span class="format-title">
               {{ fmt.format }}
               {% if fmt.results and fmt.results|length %}
-                <span class="meta">— {{ fmt.results|length }} method(s)</span>
+                <span class="meta">- {{ fmt.results|length }} method(s)</span>
               {% endif %}
             </span>
             <span class="chev" aria-hidden="true">▸</span>
@@ -116,13 +116,13 @@
                   <h4>
                     {{ block.method }}
                     {% if block.duration_ms is defined %}
-                      <span class="meta">— {{ "%.1f"|format(block.duration_ms) }} ms</span>
+                      <span class="meta">- {{ "%.1f"|format(block.duration_ms) }} ms</span>
                     {% endif %}
                   </h4>
                   {% if block.hits %}
                     <ul class="hit-list">
                       {% for hit in block.hits %}
-                        <li>{{ hit.match }} <span class="score">— {{ "%.1f"|format(hit.score) }}</span></li>
+                        <li>{{ hit.match }} <span class="score">- {{ "%.1f"|format(hit.score) }}</span></li>
                       {% endfor %}
                     </ul>
                   {% else %}
