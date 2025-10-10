@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     # columns
     col_first: str = "first_name"
     col_last: str = "last_name"
+    # formats
+    possible_formats: list[str] = ["raw", "Metaphone", "IPA"]
+    default_format: str = "raw"
 
     class Config:
         env_prefix = "FUZZYAPP_"

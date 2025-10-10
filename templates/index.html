@@ -64,6 +64,21 @@
           <div id="methodHidden"></div>
         </div>
 
+        <!-- String Formats as chips -->
+        <div style="grid-column: 1 / -1;">
+          <label class="label">String Formats</label>
+
+          <div id="formatChips"
+               class="methods"
+               data-selected='{{ (formats or []) | tojson | safe }}'>
+            {% for f in all_formats %}
+              <button type="button" class="chip" data-value="{{ f }}">{{ f }}</button>
+            {% endfor %}
+          </div>
+          <div id="formatHidden"></div>
+          <p class="meta">Tip: select multiple formats if you want to compare behavior.</p>
+        </div>
+
         <div>
           <label class="label">Limit</label>
           <input class="number" type="number" name="limit" min="1" max="100" value="{{ limit or 5 }}">
@@ -125,10 +140,10 @@
       });
     })();
 
-    // Chip multi-select -> hidden inputs named "methods"
-    (function(){
-      const wrap = document.getElementById('methodChips');
-      const hidden = document.getElementById('methodHidden');
+    // Reusable chip multi-select -> hidden inputs
+    function initChipMulti({wrapId, hiddenId, inputName}) {
+      const wrap = document.getElementById(wrapId);
+      const hidden = document.getElementById(hiddenId);
       if (!wrap || !hidden) return;
 
       const selected = new Set(JSON.parse(wrap.dataset.selected || '[]'));
@@ -138,7 +153,7 @@
         for (const v of selected) {
           const inp = document.createElement('input');
           inp.type = 'hidden';
-          inp.name = 'methods';
+          inp.name = inputName;          // important: same name for array posts
           inp.value = v;
           hidden.appendChild(inp);
         }
@@ -166,7 +181,12 @@
       }
 
       syncHidden();
-    })();
+    }
+
+    // Methods
+    initChipMulti({ wrapId: 'methodChips', hiddenId: 'methodHidden', inputName: 'methods' });
+    // String Formats
+    initChipMulti({ wrapId: 'formatChips', hiddenId: 'formatHidden', inputName: 'formats' });
   </script>
 </body>
 </html>

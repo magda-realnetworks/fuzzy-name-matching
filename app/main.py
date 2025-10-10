@@ -56,6 +56,7 @@ async def index(request: Request):
         "field": "full",
         "methods": [],
         "all_methods": list_matchers(),
+        "all_formats": settings.possible_formats,
         "limit": settings.default_limit,
         "results": None
     })
@@ -67,6 +68,7 @@ async def search_form(
     query: str = Form(...),
     field: str = Form(...),
     methods: Optional[List[str]] = Form(None),
+    formats: Optional[List[str]] = Form(None),
     limit: int = Form(settings.default_limit)
 ):
     """
@@ -82,6 +84,7 @@ async def search_form(
         query,        # query
         field,        # "first" | "last" | "full"
         methods,      # may be None -> defaults inside service
+        formats,      # may be None -> defaults inside service
         limit,        # may be any int -> clamped inside service
         None,         # score_cutoff -> default inside service
         None          # method_params -> {}
@@ -93,6 +96,8 @@ async def search_form(
         "field": field,
         "methods": methods,
         "all_methods": list_matchers(),
+        "formats": formats, 
+        "all_formats": settings.possible_formats,
         "limit": limit,
         "results": results
     })
