@@ -4,6 +4,11 @@ import pandas as pd
 
 from app.services.dataset import DataContainer
 from app.matchers.base import list_matchers, get_matcher
+from app.core.config import settings
+import jellyfish
+from g2p_en import G2p
+
+g2p = G2p()
 
 
 def _pick_col(df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
@@ -30,6 +35,7 @@ def evaluate_pairs(
     field: str,                       # "first" | "last" | "full"
     pairs_df: pd.DataFrame,           # columns like mispelled/misspelled + correct
     methods: Optional[List[str]] = None,
+    formats: Optional[List[str]] = None,
 ) -> List[Dict[str, Any]]:
     """
     For each (mispelled, correct) row:
@@ -67,28 +73,37 @@ def evaluate_pairs(
     # ---- add 'correct' values temporarily to a copy ----
     add = pd.DataFrame({"name": pairs[right_col].drop_duplicates()})
     add["name_lc"] = add["name"].str.lower()
-    print(add)
+    add["name_lc_metaphone"] = add["name_lc"].apply(lambda x: jellyfish.metaphone(x))
+    add["name_lc_ipa"] = add["name_lc"].apply(lambda x: "".join(g2p(x)))
     df_eval = pd.concat([base, add], ignore_index=True)
     df_eval = df_eval.drop_duplicates(subset="name_lc", keep="first").reset_index(drop=True)
 
     # ---- run all/selected methods ----
     methods = sorted(methods or list_matchers())
+    formats = sorted(formats or settings.possible_formats)
+
     results: List[Dict[str, Any]] = []
+    
+    for format in formats:
+        format_results: List[Dict[str, Any]] = []
+        for m in methods:
+            matcher = get_matcher(m)
+            correct_cnt = 0
+            total = int(pairs.shape[0])
 
-    for m in methods:
-        matcher = get_matcher(m)
-        correct_cnt = 0
-        total = int(pairs.shape[0])
+            for _, row in pairs.iterrows():
+                q = row[left_col]
+                truth = row[right_col]
+                hits = matcher.search(q, df_eval, format, limit=1, score_cutoff=0, params={})
+                match=hits[0]["match"] if hits else None
+                if hits and hits[0]["match"].strip().casefold() == truth.strip().casefold():
+                    print(f"method is {m}, query is {q}, truth is {truth}, hit is {hits[0]['match']}")
+                    correct_cnt += 1
 
-        for _, row in pairs.iterrows():
-            q = row[left_col]
-            truth = row[right_col]
-            hits = matcher.search(q, df_eval, ["name"], limit=1, score_cutoff=0, params={})
-            if hits and hits[0]["match"].strip().casefold() == truth.strip().casefold():
-                print(f"method is {m}, query is {q}, truth is {truth}, hit is {hits[0]['match']}")
-                correct_cnt += 1
-
-        acc = (correct_cnt / total * 100.0) if total else 0.0
-        results.append({"method": m, "total": total, "correct": correct_cnt, "accuracy": acc})
-
+            acc = (correct_cnt / total * 100.0) if total else 0.0
+            format_results.append({"method": m, "total": total, "correct": correct_cnt, "accuracy": acc})
+        
+        results.append({"format": format, "results": format_results})
+        print(results)
+    
     return results

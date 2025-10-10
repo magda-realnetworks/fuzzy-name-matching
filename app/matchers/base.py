@@ -6,14 +6,14 @@ import pandas as pd
 class Matcher(Protocol):
     name: str
     def search(
-        self,
-        query: str,
-        df: pd.DataFrame,
-        fields: List[str],
-        limit: int,
-        score_cutoff: int,
-        params: Dict[str, Any] | None = None
-    ) -> List[Dict[str, Any]]:
+            self,
+            query: str,
+            df: pd.DataFrame,
+            format: str,
+            limit: int,
+            score_cutoff: int,
+            params: Dict[str, Any] | None = None
+        ) -> List[Dict[str, Any]]:
         ...
 
 # Simple registry so new matchers auto-discoverable

@@ -165,7 +165,7 @@ async def eval_run(
     from app.services.evaluation import evaluate_pairs
     container: DataContainer = request.app.state.data
     try:
-        results = await anyio.to_thread.run_sync(evaluate_pairs, container, field, pairs_df, None)
+        results = await anyio.to_thread.run_sync(evaluate_pairs, container, field, pairs_df)
         error = None
     except Exception as e:
         results, error = None, str(e)
