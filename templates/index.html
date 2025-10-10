@@ -95,29 +95,49 @@
 
     {% if results %}
       <h2 class="section-title">Results</h2>
-      {% for block in results %}
-        <div class="method-block">
-          <h3>
-            {{ block.method }}
-            {% if block.duration_ms is defined %}
-              <span class="meta">— {{ "%.1f"|format(block.duration_ms) }} ms</span>
-            {% endif %}
-          </h3>
-          {% if block.hits %}
-            <ul class="hit-list">
-              {% for hit in block.hits %}
-                <li>{{ hit.match }} <span class="score">— {{ "%.1f"|format(hit.score) }}</span></li>
+
+      {% for fmt in results %}
+        {% set fmt_id = 'fmt-' ~ (fmt.format|replace(' ', '_')|lower) %}
+        <details class="format-block" id="{{ fmt_id }}">
+          <summary class="format-summary">
+            <span class="format-title">
+              {{ fmt.format }}
+              {% if fmt.results and fmt.results|length %}
+                <span class="meta">— {{ fmt.results|length }} method(s)</span>
+              {% endif %}
+            </span>
+            <span class="chev" aria-hidden="true">▸</span>
+          </summary>
+
+          {% if fmt.results %}
+            <div class="format-grid">
+              {% for block in fmt.results %}
+                <div class="method-block">
+                  <h4>
+                    {{ block.method }}
+                    {% if block.duration_ms is defined %}
+                      <span class="meta">— {{ "%.1f"|format(block.duration_ms) }} ms</span>
+                    {% endif %}
+                  </h4>
+                  {% if block.hits %}
+                    <ul class="hit-list">
+                      {% for hit in block.hits %}
+                        <li>{{ hit.match }} <span class="score">— {{ "%.1f"|format(hit.score) }}</span></li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <p><em>No matches</em></p>
+                  {% endif %}
+                </div>
               {% endfor %}
-            </ul>
+            </div>
           {% else %}
-            <p><em>No matches</em></p>
+            <p class="meta" style="padding: 0 12px 12px;">No method results for this format.</p>
           {% endif %}
-        </div>
+        </details>
       {% endfor %}
     {% endif %}
 
-    <footer class="footer">Fuzzy Name Search • {{ all_methods|length }} method(s) available</footer>
-  </div>
 
   <script>
     // Theme toggle (remembers your choice)
@@ -138,6 +158,22 @@
         if (next) localStorage.setItem(key, next); else localStorage.removeItem(key);
         applyTheme(next);
       });
+    })();
+
+    (function() {
+    const key = (id) => `format-open:${id}`;
+    for (const d of document.querySelectorAll('details.format-block')) {
+      const id = d.id || '';
+      // restore
+      try { if (localStorage.getItem(key(id)) === '1') d.setAttribute('open', ''); } catch {}
+      // persist on toggle
+      d.addEventListener('toggle', () => {
+        try {
+          if (d.open) localStorage.setItem(key(id), '1');
+          else localStorage.removeItem(key(id));
+        } catch {}
+      });
+    }
     })();
 
     // Reusable chip multi-select -> hidden inputs

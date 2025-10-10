@@ -84,7 +84,7 @@ async def search_form(
         query,        # query
         field,        # "first" | "last" | "full"
         methods,      # may be None -> defaults inside service
-        #formats,      # may be None -> defaults inside service
+        formats,      # may be None -> defaults inside service
         limit,        # may be any int -> clamped inside service
         None,         # score_cutoff -> default inside service
         None          # method_params -> {}

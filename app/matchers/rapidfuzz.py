@@ -53,13 +53,20 @@ def _register_matcher(name: str, scorer) -> None:
             self,
             query: str,
             df: pd.DataFrame,
-            fields: List[str],
+            format: str,
             limit: int,
             score_cutoff: int,
             params: Dict[str, Any] | None = None
         ) -> List[Dict[str, Any]]:
             q = query.lower()
-            choices = df["name_lc"].values
+            if format == "raw":
+                choices = df["name_lc"].values
+            elif format == "Metaphone":
+                choices = df["name_lc_metaphone"].values
+            elif format == "IPA":
+                choices = df["name_lc_ipa"].values
+            else:
+                raise ValueError(f"Unknown format: {format}")
             hits = process.extract(
                 q,
                 choices,

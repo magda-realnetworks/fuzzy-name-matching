@@ -24,15 +24,15 @@ class MatcherService:
         else:
             raise ValueError(f"Unknown field: {field}")
 
-    def _run_single_matcher(
-        self, matcher_name: str, df, query: str,
+    def _run_single_matcher_single_format(
+        self, matcher_name: str, df, query: str, format: str,
         limit: int, score_cutoff: int, params: dict
     ):
         """Run one matcher and return {'method': name, 'duration_ms': float, 'hits': [...]}."""
         from time import perf_counter
         matcher = get_matcher(matcher_name)
         t0 = perf_counter()
-        hits = matcher.search(query, df, ["name"], limit, score_cutoff, params)
+        hits = matcher.search(query, df, format, limit, score_cutoff, params)
         duration_ms = (perf_counter() - t0) * 1000.0
         return {"method": matcher_name, "duration_ms": duration_ms, "hits": hits}
 
@@ -41,6 +41,7 @@ class MatcherService:
         query: str,
         field: str,
         methods: List[str] | None = None,
+        formats: list[str] | None = None,
         limit: int | None = None,
         score_cutoff: int | None = None,
         method_params: Dict[str, Dict[str, Any]] | None = None,
@@ -74,14 +75,17 @@ class MatcherService:
         df = self._get_df_by_field(field)
 
         # start all tasks concurrently
-        futures = {
-            m: self.executor.submit(
-                self._run_single_matcher,
-                m, df, query, limit, score_cutoff, method_params.get(m, {})
-            )
-            for m in methods
-        }
+        results=[]
+        for format in formats:
+            futures = {
+                m: self.executor.submit(
+                    self._run_single_matcher_single_format,
+                    m, df, query, format, limit, score_cutoff, method_params.get(m, {})
+                )
+                for m in methods
+            }
 
-        # collect results in the fixed order
-        results = [futures[m].result() for m in methods]
+            # collect results in the fixed order
+            format_results = [futures[m].result() for m in methods]
+            results.append({"format": format, "results": format_results})
         return results

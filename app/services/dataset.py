@@ -24,5 +24,6 @@ def load_dataset(path=None, limit=None) -> DataContainer:
 
     for d in [df_first, df_last, df_full]:
         d["name_lc"] = d["name"].str.lower()
-
+        d["name_lc_metaphone"] = d["name_lc"]  # add transformation logic later
+        d["name_lc_ipa"] = d["name_lc"]        # add transformation logic later
     return DataContainer(df_first=df_first, df_last=df_last, df_full=df_full)

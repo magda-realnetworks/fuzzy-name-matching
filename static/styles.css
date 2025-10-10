@@ -198,3 +198,51 @@ input, select, button, textarea, option {
   color: var(--accent-contrast);
   border-color: var(--accent);
 }
+
+/* --------- Collapsible Formats --------- */
+.format-block {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.format-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+}
+.format-summary::-webkit-details-marker { display: none; }
+
+.format-title { font-size: 1rem; display: flex; align-items: center; gap: 8px; }
+
+.chev { transition: transform .15s ease; }
+.format-block[open] .chev { transform: rotate(90deg); }
+
+/* Inner grid stays the same as before */
+.format-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  padding: 12px;
+}
+@media (min-width: 900px) {
+  .format-grid { grid-template-columns: 1fr 1fr; }
+}
+.format-block .method-block {
+  margin: 0;
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 10px;
+  box-shadow: none;
+}
+.format-block .method-block h4 { margin: 0 0 6px 0; font-size: 1rem; }
+
