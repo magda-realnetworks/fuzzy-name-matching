@@ -3,6 +3,8 @@ import pandas as pd
 from app.core.config import settings
 import jellyfish
 from g2p_en import G2p
+import nltk
+nltk.download('averaged_perceptron_tagger_eng')
 
 g2p = G2p()
 
