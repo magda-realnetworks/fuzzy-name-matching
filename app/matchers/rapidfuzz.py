@@ -21,6 +21,7 @@ import pandas as pd
 import jellyfish
 from g2p_en import G2p
 from app.services.dataset import name_to_ipa_g2p_en
+from app.matchers.panphon_sim import sim_fast_levenshtein, sim_dolgo_prime, sim_feature_edit
 
 g2p = G2p()
 
@@ -108,3 +109,8 @@ _register_matcher("rapidfuzz_LCSseq", distance.LCSseq.normalized_similarity)
 _register_matcher("rapidfuzz_OSA", distance.OSA.normalized_similarity)
 _register_matcher("rapidfuzz_Prefix", distance.Prefix.normalized_similarity)
 _register_matcher("rapidfuzz_Postfix", distance.Postfix.normalized_similarity)
+
+########## register panphon_sim methods
+_register_matcher("panphon_sim_fast_levenshtein", sim_fast_levenshtein)
+_register_matcher("panphon_sim_dolgo_prime", sim_dolgo_prime)
+_register_matcher("panphon_sim_feature_edit", sim_feature_edit)
