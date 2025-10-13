@@ -7,6 +7,7 @@ from app.matchers.base import list_matchers, get_matcher
 from app.core.config import settings
 import jellyfish
 from g2p_en import G2p
+from app.services.dataset import name_to_ipa_g2p_en
 
 g2p = G2p()
 
@@ -62,11 +63,11 @@ def evaluate_pairs(
 
     # ---- choose base DF by field ----
     if field == "first":
-        base = container.df_first[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet"]]
+        base = container.df_first[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet", "name_lc_ipa"]]
     elif field == "last":
-        base = container.df_last[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet"]]
+        base = container.df_last[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet", "name_lc_ipa"]]
     elif field == "full":
-        base = container.df_full[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet"]]
+        base = container.df_full[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet", "name_lc_ipa"]]
     else:
         raise ValueError(f"Unknown field: {field}")
 
@@ -75,6 +76,7 @@ def evaluate_pairs(
     add["name_lc"] = add["name"].str.lower()
     add["name_lc_metaphone"] = add["name_lc"].apply(lambda x: jellyfish.metaphone(x))
     add["name_lc_arpabet"] = add["name_lc"].apply(lambda x: "".join(g2p(x)))
+    add["name_lc_ipa"] = add["name_lc"].apply(name_to_ipa_g2p_en)
     print("added rows:")
     print(add)
     df_eval = pd.concat([base, add], ignore_index=True)

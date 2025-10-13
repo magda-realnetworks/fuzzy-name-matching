@@ -20,6 +20,8 @@ from typing import Any, Dict, List, Tuple
 import pandas as pd
 import jellyfish
 from g2p_en import G2p
+from app.services.dataset import name_to_ipa_g2p_en
+
 g2p = G2p()
 
 from rapidfuzz import distance, fuzz, process
@@ -70,6 +72,9 @@ def _register_matcher(name: str, scorer) -> None:
             elif format == "ARPABET":
                 choices = df["name_lc_arpabet"].values
                 q = "".join(g2p(query.lower()))
+            elif format == "IPA":
+                choices = df["name_lc_ipa"].values
+                q = name_to_ipa_g2p_en(query.lower())
             else:
                 raise ValueError(f"Unknown format: {format}")
             hits = process.extract(
