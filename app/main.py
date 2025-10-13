@@ -58,7 +58,9 @@ async def index(request: Request):
         "all_methods": list_matchers(),
         "all_formats": settings.possible_formats,
         "limit": settings.default_limit,
-        "results": None
+        "results": None,
+        "base_dataset_name": str(settings.data_path).split("/")[-1],
+        "base_dataset_length": len(request.app.state.data.df_full),
     })
 
 
@@ -99,7 +101,9 @@ async def search_form(
         "formats": formats, 
         "all_formats": settings.possible_formats,
         "limit": limit,
-        "results": results
+        "results": results,
+        "base_dataset_name": str(settings.data_path).split("/")[-1],
+        "base_dataset_length": len(request.app.state.data.df_full),
     })
 
 # ---------- Evaluation page (no API exposure) ----------

@@ -111,6 +111,6 @@ _register_matcher("rapidfuzz_Prefix", distance.Prefix.normalized_similarity)
 _register_matcher("rapidfuzz_Postfix", distance.Postfix.normalized_similarity)
 
 ########## register panphon_sim methods
-_register_matcher("panphon_sim_fast_levenshtein", sim_fast_levenshtein)
-_register_matcher("panphon_sim_dolgo_prime", sim_dolgo_prime)
-_register_matcher("panphon_sim_feature_edit", sim_feature_edit)
+#_register_matcher("panphon_sim_fast_levenshtein", sim_fast_levenshtein)
+#_register_matcher("panphon_sim_dolgo_prime", sim_dolgo_prime)
+#_register_matcher("panphon_sim_feature_edit", sim_feature_edit)
