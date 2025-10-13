@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     col_first: str = "first_name"
     col_last: str = "last_name"
     # formats
-    possible_formats: list[str] = ["raw", "Metaphone", "IPA"]
+    possible_formats: list[str] = ["raw", "Metaphone", "ARPABET"]
     default_format: list[str] = ["raw"]
 
     class Config:

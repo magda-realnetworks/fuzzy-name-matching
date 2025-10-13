@@ -67,8 +67,8 @@ def _register_matcher(name: str, scorer) -> None:
             elif format == "Metaphone":
                 choices = df["name_lc_metaphone"].values
                 q= jellyfish.metaphone(query.lower())
-            elif format == "IPA":
-                choices = df["name_lc_ipa"].values
+            elif format == "ARPABET":
+                choices = df["name_lc_arpabet"].values
                 q = "".join(g2p(query.lower()))
             else:
                 raise ValueError(f"Unknown format: {format}")

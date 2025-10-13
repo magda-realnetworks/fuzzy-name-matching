@@ -62,11 +62,11 @@ def evaluate_pairs(
 
     # ---- choose base DF by field ----
     if field == "first":
-        base = container.df_first[["name", "name_lc", "name_lc_metaphone", "name_lc_ipa"]]
+        base = container.df_first[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet"]]
     elif field == "last":
-        base = container.df_last[["name", "name_lc", "name_lc_metaphone", "name_lc_ipa"]]
+        base = container.df_last[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet"]]
     elif field == "full":
-        base = container.df_full[["name", "name_lc", "name_lc_metaphone", "name_lc_ipa"]]
+        base = container.df_full[["name", "name_lc", "name_lc_metaphone", "name_lc_arpabet"]]
     else:
         raise ValueError(f"Unknown field: {field}")
 
@@ -74,7 +74,7 @@ def evaluate_pairs(
     add = pd.DataFrame({"name": pairs[right_col].drop_duplicates()})
     add["name_lc"] = add["name"].str.lower()
     add["name_lc_metaphone"] = add["name_lc"].apply(lambda x: jellyfish.metaphone(x))
-    add["name_lc_ipa"] = add["name_lc"].apply(lambda x: "".join(g2p(x)))
+    add["name_lc_arpabet"] = add["name_lc"].apply(lambda x: "".join(g2p(x)))
     print("added rows:")
     print(add)
     df_eval = pd.concat([base, add], ignore_index=True)
